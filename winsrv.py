@@ -3,10 +3,11 @@ import os
 import sys
 import socket
 
-
+# redirecting stdout to send it through the socket
 old_stdout = sys.stdout
 sys.stdout = mystdout = io.StringIO()
 
+# some constants
 HOST = ''                 # Symbolic name meaning all available interfaces
 PORT = 50007              # Arbitrary non-privileged port
 BUFFER = 2048
@@ -29,8 +30,8 @@ while True:
         conn.sendto(ret.encode()[:BIGBUFFER], addr)
         while len(ret.encode()) > BIGBUFFER:  # if len(ret) <= 8192, we skip and send 0  ___
             conn.sendto(str(1).encode(), addr)   # return code "it is not finished"        |
-            ret = ret[BIGBUFFER:]                # truncate                                |
-            conn.sendto(ret.encode[:BIGBUFFER], addr)  # send                              |
+            ret = ret[BIGBUFFER:]                # truncate the message                    |
+            conn.sendto(ret.encode[:BIGBUFFER], addr)  # send the next part of it          |
         conn.sendto(str(0).encode(), addr)       # return code "okay"  /___________________|
     except ConnectionAbortedError:
         print("Connection was reset")
