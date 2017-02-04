@@ -20,22 +20,22 @@ print("Started on localhost", PORT, file=old_stdout)
 
 while True:
     # receiving
-    data, addr = conn.recvfrom(BUFFER)
+    data, addr = s.recvfrom(BUFFER)
     print("Received {", data.decode(), "} from L-o-W", file=old_stdout)
     # executing request on windows
     ret = os.popen(data.decode()).read()
     ret = mystdout.getvalue() + "\n" + str(ret)
     # sending process
     try:
-        conn.sendto(ret.encode()[:BIGBUFFER], addr)
+        s.sendto(ret.encode()[:BIGBUFFER], addr)
         while len(ret.encode()) > BIGBUFFER:  # if len(ret) <= 8192, we skip and send 0  ___
-            conn.sendto(str(1).encode(), addr)   # return code "it is not finished"        |
+            s.sendto(str(1).encode(), addr)   # return code "it is not finished"        |
             ret = ret[BIGBUFFER:]                # truncate the message                    |
-            conn.sendto(ret.encode[:BIGBUFFER], addr)  # send the next part of it          |
-        conn.sendto(str(0).encode(), addr)       # return code "okay"  /___________________|
+            s.sendto(ret.encode[:BIGBUFFER], addr)  # send the next part of it          |
+        s.sendto(str(0).encode(), addr)       # return code "okay"  /___________________|
     except ConnectionAbortedError:
         print("Connection was reset")
-        exit(1)
+        # exit(1)
     
     mystdout.truncate(0)
 
